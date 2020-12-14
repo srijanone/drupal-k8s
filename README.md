@@ -1,4 +1,9 @@
-# Drupal kubernetes deployment example
+# Drupal kubernetes deployment example on local machine
+
+## Ensure you have following tools installed
+- Minikube 
+- kubectl
+- Docker for Desktop
 
 Start the kubernetes cluster with minikube
 ```
