@@ -1,0 +1,70 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-pvc
+  namesapce: d8
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mysql
+  namesapce: d8
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: drupal
+            - name: MYSQL_USER
+              value: drupal
+            - name: MYSQL_PASSWORD
+              value: drupal
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: 'yes'
+          volumeMounts:
+            - mountPath: /var/lib/mysql/
+              name: database
+          resources:
+            limits:
+              cpu: '2'
+              memory: '512Mi'
+            requests:
+              cpu: '500m'
+              memory: '256Mi'
+      volumes:
+        - name: database
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql
+  namesapce: d8
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
